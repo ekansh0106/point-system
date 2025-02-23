@@ -1,0 +1,8 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}Parent Dashboard{% endblock %}
+
+{% block content %}
+    <h2>Welcome to the Parent Dashboard, {{ session['user'] }}!</h2>
+    <!-- Add parent-specific content here -->
+{% endblock %}

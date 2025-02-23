@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+</head>
+<body>
+    <h2>Register New User</h2>
+    <form action="{{ url_for('auth.register') }}" method="POST">
+        <input type="text" name="username" placeholder="Username" required>
+        <input type="password" name="password" placeholder="Password" required>
+        <select name="role" required>
+            <option value="Parent">Parent</option>
+            <option value="Child">Child</option>
+        </select>
+        <button type="submit">Register</button>
+    </form>
+    <a href="{{ url_for('auth.login') }}">Already have an account? Login here.</a>
+</body>
+</html>
