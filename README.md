@@ -110,27 +110,47 @@ point-system/
 
 ## Getting Started
 
-1. Clone the repository
-2. Create a virtual environment:
+1. Clone the repository:
    ```bash
-   python -m venv .venv
-   source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+   git clone <repository-url>
+   cd point-system
    ```
 
-3. Install dependencies:
+2. Install Poetry (if not already installed):
    ```bash
-   pip install -r requirements.txt
+   curl -sSL https://install.python-poetry.org | python3 -
    ```
 
-4. Initialize the database:
+3. Install dependencies using Poetry:
    ```bash
+   poetry install
+   ```
+
+4. Activate the virtual environment:
+   ```bash
+   poetry env use python  # Creates virtual env if it doesn't exist
+   poetry env activate    # Activates the virtual environment
+   ```
+
+5. Initialize the database:
+   ```bash
+   flask --app run.py db init
+   flask --app run.py db migrate -m "Initial migration"
    flask --app run.py db upgrade
    ```
 
-5. Run the API:
+6. Run the API:
    ```bash
    python run.py
    ```
+
+Note: Make sure you have Python 3.8 or higher installed on your system.
+
+Alternatively, you can prefix each command with `poetry run` if you don't want to activate the virtual environment:
+```bash
+poetry run flask --app run.py db init
+poetry run python run.py
+```
 
 ## Features to be Implemented
 
