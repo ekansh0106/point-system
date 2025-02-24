@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, TextAreaField, SubmitField, SelectField
 from wtforms.validators import DataRequired, Email, ValidationError
-from app.models.user import User
+from core.app.models.user import User
 
 class AddChildForm(FlaskForm):
     """Form for parents to add/register a child"""

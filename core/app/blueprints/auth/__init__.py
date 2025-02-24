@@ -1,9 +1,7 @@
 from flask import Blueprint
 
-auth_bp = Blueprint('auth', __name__,
-    template_folder='templates',
-    static_folder='static',
-    static_url_path='/auth/static')
+auth_bp = Blueprint('auth', __name__, 
+                   template_folder='templates',
+                   url_prefix='/auth')
 
-# Import routes after blueprint creation to avoid circular imports
-from . import routes, forms
+from . import routes, forms  # Import at the end to avoid circular imports

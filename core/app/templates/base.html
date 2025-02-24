@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% endblock %} - Parent Control App</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <div class="container">
+        {% block header %}
+            <h2>{% block page_title %}{% endblock %}</h2>
+        {% endblock %}
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} fade-out">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                var alerts = document.getElementsByClassName('alert');
+                for(var i = 0; i < alerts.length; i++) {
+                    alerts[i].style.display = 'none';
+                }
+            }, 3000);
+        });
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html> 

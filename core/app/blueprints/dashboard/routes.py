@@ -1,34 +1,34 @@
 from flask import render_template, redirect, url_for, flash, request
 from flask_login import login_required, current_user
+from core.app import db
+from core.app.models.user import User
 from . import dashboard_bp
 from .forms import AddChildForm, UpdateChildForm, ParentSettingsForm
-from app import db
-from app.models.user import User
 
 @dashboard_bp.route('/')
 @login_required
-def dashboard():
-    if current_user.is_parent():
+def index():
+    # Redirect based on user role
+    if current_user.role == 'parent':
         return redirect(url_for('dashboard.parent_dashboard'))
-    return redirect(url_for('dashboard.child_dashboard'))
+    elif current_user.role == 'child':
+        return redirect(url_for('dashboard.child_dashboard'))
+    else:
+        return "Invalid role", 403
 
 @dashboard_bp.route('/parent')
 @login_required
 def parent_dashboard():
-    if not current_user.is_parent():
-        flash('Access denied. Parents only.', 'danger')
-        return redirect(url_for('dashboard.dashboard'))
-    
-    children = current_user.children.all()
+    if current_user.role != 'parent':
+        return "Unauthorized", 403
+    children = current_user.get_children()
     return render_template('dashboard/parent_dashboard.html', children=children)
 
 @dashboard_bp.route('/child')
 @login_required
 def child_dashboard():
-    if not current_user.is_child():
-        flash('Access denied. Children only.', 'danger')
-        return redirect(url_for('dashboard.dashboard'))
-    
+    if current_user.role != 'child':
+        return "Unauthorized", 403
     return render_template('dashboard/child_dashboard.html')
 
 @dashboard_bp.route('/parent/add_child', methods=['GET', 'POST'])
