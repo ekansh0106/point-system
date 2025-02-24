@@ -1,6 +1,6 @@
-# Family Task Manager API
+# Family Point Reward System API
 
-A Flask-based REST API for a family task management system where parents can manage their children's tasks and activities.
+A Flask-based REST API for a family point reward system where parents can create tasks, children earn points upon completion, and redeem points for various activities.
 
 ## Features
 
@@ -8,65 +8,43 @@ A Flask-based REST API for a family task management system where parents can man
 - **Parent Account Management**
   - Register/Login as a parent
   - Profile management
-  - Password reset functionality
+  - Create and manage child accounts
+  - Approve task completion
+  - Manage reward activities and their point costs
 
 - **Child Account Management**
-  - Parents can create and manage child accounts
-  - Each child gets their own login credentials
-  - Profile customization for children
+  - Separate authentication for children
+  - View assigned and self-created tasks
+  - Track earned points
+  - Redeem points for activities
 
-### Task Management
-- **Parent Features**
-  - Create tasks for themselves and children
+### Task Management API
+- **Parent Endpoints**
+  - Create tasks with point values
   - Set task deadlines and priorities
-  - Monitor task completion status
-  - Modify or delete any task
-  - View task history and analytics
+  - Approve/reject task completion
+  - View task history and point transactions
+  - Monitor children's point balances
 
-- **Child Features**
-  - Create personal tasks
-  - View assigned tasks from parents
-  - Update task status (e.g., pending, in-progress, completed)
-  - Cannot modify deadline/details of parent-assigned tasks
+- **Child Endpoints**
+  - Create personal tasks (require parent approval)
+  - View assigned tasks
+  - Mark tasks as completed (pending parent approval)
+  - Track personal point balance
+  - View available rewards and their costs
 
-### Task Properties
-- Title
-- Description
-- Deadline
-- Status (pending, in-progress, completed)
-- Priority level
-- Created by (parent/child)
-- Assigned to
-- Creation timestamp
-- Last modified timestamp
+### Point System
+- **Task Completion**
+  - Points awarded upon parent approval
+  - Different point values for different tasks
+  - Point history tracking
+  - Running point balance
 
-## Technical Stack
-
-- **Backend**: Flask (Python)
-- **Database**: SQLAlchemy with PostgreSQL
-- **Authentication**: JWT (JSON Web Tokens)
-- **API Documentation**: Swagger/OpenAPI
-
-## Project Structure
-
-```
-family-task-manager/
-├── app/
-│   ├── __init__.py
-│   ├── config.py
-│   ├── models/
-│   │   ├── user.py      # User models (Parent/Child)
-│   │   └── task.py      # Task model
-│   ├── blueprints/
-│   │   ├── auth/        # Authentication endpoints
-│   │   ├── users/       # User management
-│   │   ├── tasks/       # Task management
-│   │   └── dashboard/   # Analytics and overview
-│   └── utils/           # Helper functions
-├── core/
-│   └── run.py
-└── tests/               # Test suite
-```
+- **Reward System**
+  - Predefined activities (TV time, gaming, outdoor play)
+  - Custom activities added by parents
+  - Different point costs for different activities
+  - Point redemption tracking
 
 ## API Endpoints
 
@@ -86,50 +64,108 @@ family-task-manager/
 - `PUT /tasks/{id}` - Update task
 - `DELETE /tasks/{id}` - Delete task (Parent only)
 - `PUT /tasks/{id}/status` - Update task status
+- `POST /tasks/{id}/approve` - Approve task completion (Parent only)
 
-### Dashboard
-- `GET /dashboard/overview` - Get task statistics
-- `GET /dashboard/tasks/pending` - List pending tasks
-- `GET /dashboard/tasks/completed` - List completed tasks
+### Point System
+- `GET /points/balance` - Get current point balance
+- `GET /points/history` - Get point transaction history
+- `POST /points/redeem` - Redeem points for activity
+
+### Reward Management
+- `POST /rewards` - Create new reward activity (Parent only)
+- `GET /rewards` - List all available rewards
+- `PUT /rewards/{id}` - Update reward details (Parent only)
+- `DELETE /rewards/{id}` - Delete reward (Parent only)
+
+## Technical Stack
+
+- **Backend**: Flask (Python)
+- **Database**: SQLAlchemy with SQLite
+- **Authentication**: JWT (JSON Web Tokens)
+- **API Documentation**: Swagger/OpenAPI
+
+## Project Structure
+
+```
+point-system/
+├── core/
+│   ├── app/
+│   │   ├── __init__.py
+│   │   ├── models/
+│   │   │   ├── user.py        # User models (Parent/Child)
+│   │   │   ├── task.py        # Task model
+│   │   │   ├── reward.py      # Reward activities model
+│   │   │   └── transaction.py # Point transaction model
+│   │   ├── blueprints/
+│   │   │   ├── auth/          # Authentication endpoints
+│   │   │   ├── dashboard/     # Analytics endpoints
+│   │   │   ├── tasks/         # Task management endpoints
+│   │   │   └── rewards/       # Reward management endpoints
+│   │   └── templates/         # Templates for testing API (Not for production)
+├── migrations/                # Database migrations
+├── .gitignore
+├── requirements.txt
+└── run.py                    # Application entry point
+```
 
 ## Getting Started
 
 1. Clone the repository
-2. Install dependencies:
+2. Create a virtual environment:
    ```bash
-   poetry install
+   python -m venv .venv
+   source .venv/bin/activate  # On Windows: .venv\Scripts\activate
    ```
 
-3. Set up environment variables:
+3. Install dependencies:
    ```bash
-   export FLASK_APP=core.run
-   export FLASK_ENV=development
-   export DATABASE_URL=your_database_url
-   export SECRET_KEY=your_secret_key
+   pip install -r requirements.txt
    ```
 
 4. Initialize the database:
    ```bash
-   flask db upgrade
+   flask --app run.py db upgrade
    ```
 
-5. Run the application:
+5. Run the API:
    ```bash
-   flask run
+   python run.py
    ```
 
-## Testing
+## Features to be Implemented
 
-Run tests using:
-```bash
-poetry run pytest
-```
+### Phase 1: Core API
+- [x] User Authentication
+- [x] Basic User Management
+- [ ] Task CRUD Operations
+- [ ] Point System Implementation
+- [ ] Basic Reward System
 
-## License
+### Phase 2: Enhanced Features
+- [ ] Point Transaction API
+- [ ] Reward Activity Management
+- [ ] Task Approval System
+- [ ] Point Balance Tracking
 
-[Your chosen license]
+### Phase 3: Additional Features
+- [ ] Task Categories
+- [ ] Reward Categories
+- [ ] Point Analytics
+- [ ] Activity Usage Tracking
+
+## API Documentation
+
+Detailed API documentation is available at `/api/docs` when running the server.
 
 ## Contributing
 
-[Your contribution guidelines]
+1. Fork the repository
+2. Create a feature branch
+3. Commit your changes
+4. Push to the branch
+5. Create a Pull Request
+
+## License
+
+[MIT License](LICENSE)
 ```
