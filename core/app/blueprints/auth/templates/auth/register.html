@@ -5,32 +5,82 @@
 {% block page_title %}Register New User{% endblock %}
 
 {% block content %}
-<form action="{{ url_for('auth.register') }}" method="POST">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-    <div class="form-group">
-        <label for="username">Username:</label>
-        <input type="text" id="username" name="username" placeholder="Enter username" required>
-    </div>
-    <div class="form-group">
-        <label for="email">Email:</label>
-        <input type="email" id="email" name="email" placeholder="Enter email" required>
-    </div>
-    <div class="form-group">
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password" placeholder="Enter password" required>
-    </div>
-    <div class="form-group">
-        <label for="confirm_password">Confirm Password:</label>
-        <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirm password" required>
-    </div>
-    <div class="form-group">
-        <label for="role">Role:</label>
-        <select id="role" name="role" required>
-            <option value="parent">Parent</option>
-            <option value="child">Child</option>
-        </select>
-    </div>
-    <button type="submit" class="btn btn-primary">Register</button>
-</form>
-<a href="{{ url_for('auth.login') }}">Already have an account? Login here.</a>
+<div class="form-container">
+    <form method="POST" action="{{ url_for('auth.register') }}">
+        <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" class="form-control" required>
+        </div>
+
+        <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" class="form-control" required>
+        </div>
+
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" class="form-control" required>
+        </div>
+
+        <div class="form-group">
+            <label for="confirm_password">Confirm Password</label>
+            <input type="password" id="confirm_password" name="confirm_password" class="form-control" required>
+        </div>
+
+        <div class="form-group">
+            <label for="role">Role</label>
+            <select id="role" name="role" class="form-control" required>
+                <option value="parent">Parent</option>
+                <option value="child">Child</option>
+            </select>
+        </div>
+
+        <div id="parent_code_group" class="form-group" style="display: none;">
+            <label for="parent_code">Parent Code</label>
+            <input type="text" id="parent_code" name="parent_code" class="form-control" placeholder="Enter the code provided by your parent">
+            <small class="form-text text-info">This code is required to link your account with your parent's account</small>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Register</button>
+            <a href="{{ url_for('auth.login') }}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+    
+    <a href="{{ url_for('auth.login') }}" class="login-link">Already have an account? Login here.</a>
+</div>
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const roleSelect = document.getElementById('role');
+    const parentCodeGroup = document.getElementById('parent_code_group');
+    const parentCodeInput = document.getElementById('parent_code');
+    const form = document.querySelector('form');
+
+    function toggleParentCode() {
+        if (roleSelect.value === 'child') {
+            parentCodeGroup.style.display = 'block';
+            parentCodeInput.required = true;
+        } else {
+            parentCodeGroup.style.display = 'none';
+            parentCodeInput.required = false;
+        }
+    }
+
+    roleSelect.addEventListener('change', toggleParentCode);
+    
+    // Initial check
+    toggleParentCode();
+
+    // Form validation
+    form.addEventListener('submit', function(e) {
+        if (roleSelect.value === 'child' && !parentCodeInput.value.trim()) {
+            e.preventDefault();
+            alert('Parent code is required for child registration');
+        }
+    });
+});
+</script>
+{% endblock %}
 {% endblock %}

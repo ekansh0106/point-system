@@ -34,10 +34,11 @@ def create_app(config_name='default'):
     # Import and register blueprints
     from .blueprints.auth import auth_bp
     from .blueprints.dashboard import dashboard_bp
+    from .blueprints.parent import parent_bp
     
     app.register_blueprint(auth_bp, url_prefix='/auth')
     app.register_blueprint(dashboard_bp, url_prefix='/dashboard')
-    # Add other blueprints here as needed
+    app.register_blueprint(parent_bp, url_prefix='/parent')
 
     # Import models to ensure they're known to Flask-SQLAlchemy
     from .models import user
