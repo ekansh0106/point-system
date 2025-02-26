@@ -1,15 +1,110 @@
-from flask import jsonify, request
+from flask import jsonify, request, Blueprint, render_template, redirect, url_for, flash
 from flask_login import login_required, current_user
 from core.app.models.user import User
-from core.app import db
-from . import parent_bp
-from .utils import parent_required
+from core.app.extensions import db
+from core.app.utils.decorators import parent_required
 import logging
+import os
 
 # Set up logging
 logger = logging.getLogger(__name__)
 
-@parent_bp.route('/children', methods=['GET'])
+# Get the directory where this file is located
+current_dir = os.path.dirname(os.path.abspath(__file__))
+template_dir = os.path.join(current_dir, 'templates')
+
+parent = Blueprint('parent', __name__, template_folder='templates')
+
+@parent.route('/')
+def root():
+    """Root route that redirects to appropriate dashboard based on user status"""
+    if not current_user.is_authenticated:
+        return redirect(url_for('auth.login'))
+    
+    if current_user.role == 'child':
+        flash('Access denied. This area is for parents only.', 'error')
+        return redirect(url_for('child.dashboard'))
+        
+    return redirect(url_for('parent.dashboard'))
+
+@parent.route('/dashboard')
+@login_required
+@parent_required
+def dashboard():
+    return render_template('parent/dashboard.html')
+
+@parent.route('/add_child', methods=['GET', 'POST'])
+@login_required
+@parent_required
+def add_child():
+    if request.method == 'POST':
+        username = request.form.get('username')
+        email = request.form.get('email')
+        password = request.form.get('password')
+        confirm_password = request.form.get('confirm_password')
+
+        if password != confirm_password:
+            flash('Passwords do not match', 'error')
+            return render_template('parent/add_child.html')
+
+        # Check if username or email already exists
+        if User.query.filter_by(username=username).first():
+            flash('Username already exists', 'error')
+            return render_template('parent/add_child.html')
+        
+        if User.query.filter_by(email=email).first():
+            flash('Email already exists', 'error')
+            return render_template('parent/add_child.html')
+
+        # Create new child account
+        child = User(
+            username=username,
+            email=email,
+            role='child',
+            parent_id=current_user.id
+        )
+        child.set_password(password)
+
+        db.session.add(child)
+        db.session.commit()
+
+        flash('Child account created successfully', 'success')
+        return redirect(url_for('parent.dashboard'))
+
+    return render_template('parent/add_child.html')
+
+@parent.route('/remove_child/<int:child_id>', methods=['POST'])
+@login_required
+@parent_required
+def remove_child_form(child_id):
+    """Handle form-based child removal"""
+    child = User.query.get_or_404(child_id)
+    
+    # Verify that the child belongs to the current parent
+    if child.parent_id != current_user.id:
+        flash('Unauthorized action', 'error')
+        return redirect(url_for('parent.dashboard'))
+    
+    db.session.delete(child)
+    db.session.commit()
+    
+    flash('Child account removed successfully', 'success')
+    return redirect(url_for('parent.dashboard'))
+
+@parent.route('/view_child/<int:child_id>')
+@login_required
+@parent_required
+def view_child(child_id):
+    child = User.query.get_or_404(child_id)
+    
+    # Verify that the child belongs to the current parent
+    if child.parent_id != current_user.id:
+        flash('Unauthorized action', 'error')
+        return redirect(url_for('parent.dashboard'))
+    
+    return render_template('parent/view_child.html', child=child)
+
+@parent.route('/children', methods=['GET'])
 @login_required
 @parent_required
 def get_children():
@@ -30,7 +125,7 @@ def get_children():
             'error': 'Failed to fetch children'
         }), 500
 
-@parent_bp.route('/code', methods=['GET'])
+@parent.route('/code', methods=['GET'])
 @login_required
 @parent_required
 def get_parent_code():
@@ -42,7 +137,7 @@ def get_parent_code():
         }
     })
 
-@parent_bp.route('/code/generate', methods=['POST'])
+@parent.route('/code/generate', methods=['POST'])
 @login_required
 @parent_required
 def generate_new_parent_code():
@@ -65,11 +160,11 @@ def generate_new_parent_code():
             'error': 'Failed to generate new parent code'
         }), 500
 
-@parent_bp.route('/children/<int:child_id>', methods=['DELETE'])
+@parent.route('/children/<int:child_id>', methods=['DELETE'])
 @login_required
 @parent_required
-def remove_child(child_id):
-    """Remove a child from parent's account"""
+def remove_child_api(child_id):
+    """API endpoint to remove a child from parent's account"""
     child = User.query.get(child_id)
     if not child or child.parent_id != current_user.id:
         return jsonify({
@@ -92,7 +187,7 @@ def remove_child(child_id):
             'error': 'Failed to remove child'
         }), 500
 
-@parent_bp.route('/children/<int:child_id>', methods=['GET'])
+@parent.route('/children/<int:child_id>', methods=['GET'])
 @login_required
 @parent_required
 def get_child_details(child_id):
@@ -109,7 +204,7 @@ def get_child_details(child_id):
         'data': child.to_dict()
     })
 
-@parent_bp.route('/children/<int:child_id>/points', methods=['POST'])
+@parent.route('/children/<int:child_id>/points', methods=['POST'])
 @login_required
 @parent_required
 def update_child_points(child_id):

@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block title %}View Child - {{ child.username }}{% endblock %}
+
+{% block page_title %}Child Details - {{ child.username }}{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <div class="dashboard-header">
+        <div class="header-content">
+            <h3>{{ child.username }}'s Profile</h3>
+            <p>Manage points and view activity</p>
+        </div>
+        <div class="header-actions">
+            <a href="{{ url_for('parent.dashboard') }}" class="btn btn-secondary">Back to Dashboard</a>
+        </div>
+    </div>
+
+    <div class="child-details">
+        <div class="details-grid">
+            <div class="detail-card">
+                <h4>Basic Information</h4>
+                <div class="detail-item">
+                    <span class="label">Username:</span>
+                    <span class="value">{{ child.username }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="label">Email:</span>
+                    <span class="value">{{ child.email }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="label">Total Points:</span>
+                    <span class="value">{{ child.points|default(0) }}</span>
+                </div>
+            </div>
+
+            <div class="detail-card">
+                <h4>Add/Remove Points</h4>
+                <form id="pointsForm" class="points-form" onsubmit="return handlePointsSubmit(event)">
+                    <div class="form-group">
+                        <label for="points">Points:</label>
+                        <input type="number" id="points" name="points" class="form-control" required>
+                        <small class="form-text text-muted">Use positive numbers to add points, negative to remove</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="reason">Reason:</label>
+                        <input type="text" id="reason" name="reason" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Update Points</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="points-history">
+            <h4>Points History</h4>
+            {% if child.points_history %}
+                <div class="history-list">
+                    {% for entry in child.points_history %}
+                        <div class="history-item">
+                            <div class="points-change {% if entry.points > 0 %}positive{% else %}negative{% endif %}">
+                                {{ '+' if entry.points > 0 }}{{ entry.points }}
+                            </div>
+                            <div class="points-reason">{{ entry.reason }}</div>
+                            <div class="points-date">{{ entry.timestamp.strftime('%Y-%m-%d %H:%M') }}</div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="no-history">No points history yet.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+async function handlePointsSubmit(event) {
+    event.preventDefault();
+    const form = event.target;
+    const points = form.points.value;
+    const reason = form.reason.value;
+
+    try {
+        const response = await fetch(`{{ url_for('parent.update_child_points', child_id=child.id) }}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ points: parseInt(points), reason }),
+        });
+
+        const data = await response.json();
+        if (data.success) {
+            // Reload the page to show updated points
+            window.location.reload();
+        } else {
+            alert(data.error || 'Failed to update points');
+        }
+    } catch (error) {
+        alert('Error updating points');
+        console.error('Error:', error);
+    }
+}
+</script>
+{% endblock %} 

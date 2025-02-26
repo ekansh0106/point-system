@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}Parent Dashboard{% endblock %}
+
+{% block page_title %}Parent Dashboard{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <div class="dashboard-header">
+        <div class="header-content">
+            <h3>Welcome, {{ current_user.username }}</h3>
+            <p>Manage your children's accounts and monitor their activities</p>
+        </div>
+        <div class="header-actions">
+            <a href="{{ url_for('auth.logout') }}" class="btn btn-secondary">Logout</a>
+        </div>
+    </div>
+
+    <div class="dashboard-stats">
+        <div class="stat-card">
+            <h4>Total Children</h4>
+            <div class="stat-number">{{ current_user.child_count }}</div>
+        </div>
+        <div class="stat-card">
+            <h4>Parent Code</h4>
+            <div class="stat-number">{{ current_user.parent_code or 'Not Generated' }}</div>
+            <form action="{{ url_for('parent.generate_new_parent_code') }}" method="POST" class="mt-2">
+                <button type="submit" class="btn btn-secondary btn-sm">Generate New Code</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="children-list">
+        <div class="section-header">
+            <h3>Children Accounts</h3>
+            <a href="{{ url_for('parent.add_child') }}" class="btn btn-primary">Add Child Account</a>
+        </div>
+        
+        <div class="children-grid">
+            {% if current_user.children %}
+                {% for child in current_user.children %}
+                    <div class="child-card">
+                        <h4>{{ child.username }}</h4>
+                        <p>{{ child.email }}</p>
+                        <p class="points">Points: {{ child.points|default(0) }}</p>
+                        <div class="child-actions">
+                            <a href="{{ url_for('parent.view_child', child_id=child.id) }}" class="btn btn-secondary">View Details</a>
+                            <form method="POST" action="{{ url_for('parent.remove_child_form', child_id=child.id) }}" class="inline-form" onsubmit="return confirm('Are you sure you want to remove this child account?');">
+                                <button type="submit" class="btn btn-danger">Remove</button>
+                            </form>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p class="no-children">No child accounts added yet. Add your first child account to get started.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %} 

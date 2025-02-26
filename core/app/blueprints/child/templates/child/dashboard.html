@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}Child Dashboard{% endblock %}
+
+{% block page_title %}Child Dashboard{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <div class="dashboard-header">
+        <div class="header-content">
+            <h3>Welcome, {{ current_user.username }}</h3>
+            <p>View your points and achievements</p>
+        </div>
+        <div class="header-actions">
+            <a href="{{ url_for('auth.logout') }}" class="btn btn-secondary">Logout</a>
+        </div>
+    </div>
+
+    <div class="dashboard-stats">
+        <div class="stat-card">
+            <h4>Total Points</h4>
+            <div class="stat-number">{{ current_user.points|default(0) }}</div>
+        </div>
+        <div class="stat-card">
+            <h4>Parent</h4>
+            <div class="stat-text">{{ current_user.parent.username if current_user.parent else 'No Parent Assigned' }}</div>
+        </div>
+    </div>
+
+    <div class="points-history">
+        <div class="section-header">
+            <h3>Points History</h3>
+        </div>
+        {% if current_user.points_history %}
+            <div class="history-list">
+                {% for entry in current_user.points_history %}
+                    <div class="history-item">
+                        <div class="points-change {% if entry.points > 0 %}positive{% else %}negative{% endif %}">
+                            {{ '+' if entry.points > 0 }}{{ entry.points }}
+                        </div>
+                        <div class="points-reason">{{ entry.reason }}</div>
+                        <div class="points-date">{{ entry.timestamp.strftime('%Y-%m-%d %H:%M') }}</div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="no-history">No points history yet.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %} 
