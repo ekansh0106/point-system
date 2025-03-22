@@ -31,7 +31,7 @@ def root():
 @login_required
 @parent_required
 def dashboard():
-    return render_template('parent/dashboard.html')
+    return render_template('parent/dashboard.html', body_class='dashboard-page')
 
 @parent.route('/add_child', methods=['GET', 'POST'])
 @login_required
@@ -71,7 +71,7 @@ def add_child():
         flash('Child account created successfully', 'success')
         return redirect(url_for('parent.dashboard'))
 
-    return render_template('parent/add_child.html')
+    return render_template('parent/add_child.html', body_class='dashboard-page')
 
 @parent.route('/remove_child/<int:child_id>', methods=['POST'])
 @login_required
@@ -141,24 +141,11 @@ def get_parent_code():
 @login_required
 @parent_required
 def generate_new_parent_code():
-    """Generate a new parent code"""
-    try:
-        current_user.generate_parent_code()
-        db.session.commit()
-        return jsonify({
-            'success': True,
-            'message': 'New parent code generated successfully',
-            'data': {
-                'parent_code': current_user.parent_code
-            }
-        })
-    except Exception as e:
-        logger.error(f"Error generating new parent code: {str(e)}")
-        db.session.rollback()
-        return jsonify({
-            'success': False,
-            'error': 'Failed to generate new parent code'
-        }), 500
+    print("CSRF Token in Request:", request.form.get('csrf_token'))  # Debugging log
+    current_user.generate_parent_code()
+    db.session.commit()
+    flash('Parent code generated successfully!', 'success')
+    return redirect(url_for('parent.dashboard'))
 
 @parent.route('/children/<int:child_id>', methods=['DELETE'])
 @login_required
@@ -243,4 +230,4 @@ def update_child_points(child_id):
         return jsonify({
             'success': False,
             'error': 'Failed to update points'
-        }), 500 
+        }), 500

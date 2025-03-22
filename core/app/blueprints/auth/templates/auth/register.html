@@ -5,7 +5,7 @@
 {% block page_title %}Register New User{% endblock %}
 
 {% block content %}
-<div class="form-container">
+<div class="register-container">
     <form method="POST" action="{{ url_for('auth.register') }}">
         <div class="form-group">
             <label for="username">Username</label>
@@ -84,3 +84,7 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 {% endblock %}
 {% endblock %}
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    return render_template('auth/register.html', body_class='auth-page')

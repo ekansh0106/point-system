@@ -35,6 +35,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // CSRF token handling
     const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+    console.log('CSRF Token:', csrfToken);
+
     document.querySelectorAll('form').forEach(form => {
         if (!form.querySelector('input[name="csrf_token"]')) {
             const input = document.createElement('input');
@@ -42,6 +44,18 @@ document.addEventListener('DOMContentLoaded', function() {
             input.name = 'csrf_token';
             input.value = csrfToken;
             form.appendChild(input);
+        }
+    });
+
+    // Add the CSRF token to all forms with the POST method
+    document.querySelectorAll('form[method="POST"]').forEach(form => {
+        if (!form.querySelector('input[name="csrf_token"]')) {
+            const csrfInput = document.createElement('input');
+            csrfInput.type = 'hidden';
+            csrfInput.name = 'csrf_token';
+            csrfInput.value = csrfToken;
+            form.appendChild(csrfInput);
+            console.log('CSRF token added to form:', form);
         }
     });
 
@@ -148,4 +162,63 @@ document.addEventListener('DOMContentLoaded', function() {
             hideLoader();
         }
     });
-}); 
+
+    // Function to update the loader background based on the theme
+    function updateLoaderBackground() {
+        const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+        if (currentTheme === 'dark') {
+            loaderOverlay.style.backgroundColor = 'var(--bg-primary)';
+        } else {
+            loaderOverlay.style.backgroundColor = 'var(--bg-primary)';
+        }
+    }
+
+    // Update the loader background on page load
+    updateLoaderBackground();
+
+    // Listen for theme changes and update the loader background
+    if (themeToggle) {
+        themeToggle.addEventListener('change', updateLoaderBackground);
+    }
+});
+
+async function handlePointsSubmit(event) {
+    event.preventDefault();
+    const form = event.target;
+    const points = form.points.value;
+    const reason = form.reason.value;
+    const csrfToken = document.querySelector('input[name="csrf_token"]').value;
+
+    // Disable the form and show a loading state
+    const submitButton = form.querySelector('button[type="submit"]');
+    submitButton.disabled = true;
+    submitButton.textContent = 'Updating...';
+
+    try {
+        const response = await fetch(`{{ url_for('parent.update_child_points', child_id=child.id) }}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken,
+            },
+            body: JSON.stringify({ points: parseInt(points), reason }),
+        });
+
+        const data = await response.json();
+        if (data.success) {
+            // Reload the page to show updated points
+            window.location.reload();
+        } else {
+            alert(data.error || 'Failed to update points');
+        }
+    } catch (error) {
+        alert('Error updating points');
+        console.error('Error:', error);
+    } finally {
+        // Re-enable the form and reset the button text
+        submitButton.disabled = false;
+        submitButton.textContent = 'Update Points';
+    }
+}
+
+<meta name="csrf-token" content="YOUR_CSRF_TOKEN_HERE"></meta>

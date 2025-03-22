@@ -23,10 +23,10 @@ def root():
 @login_required
 @child_required
 def dashboard():
-    return render_template('child/dashboard.html')
+    return render_template('child/dashboard.html', body_class='dashboard-page')
 
 @child.route('/profile')
 @login_required
 @child_required
 def profile():
-    return render_template('child/profile.html') 
+    return render_template('child/profile.html', body_class='profile-page') 

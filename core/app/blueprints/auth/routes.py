@@ -101,4 +101,4 @@ def register():
             flash('An error occurred during registration', 'error')
             return redirect(url_for('auth.register'))
 
-    return render_template('auth/register.html')
+    return render_template('auth/register.html',body_class='auth-page')

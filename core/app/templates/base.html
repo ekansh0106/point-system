@@ -4,71 +4,28 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}{% endblock %} - Parent Control App</title>
-    <!-- Add this script before any CSS to prevent theme flicker -->
     <script>
-        // Immediately set theme and button state before page renders
         (function() {
             const savedTheme = localStorage.getItem('theme') || 'light';
             document.documentElement.setAttribute('data-theme', savedTheme);
             document.documentElement.className = savedTheme + '-theme';
-            
-            // Create a style block to set initial button state
-            const style = document.createElement('style');
-            style.textContent = `
-                #theme-toggle { opacity: 0; }
-                #theme-toggle-initial { display: none; }
-                #theme-toggle-initial:checked + .slider { background-color: #2196F3; }
-                #theme-toggle-initial:checked + .slider:before { transform: translateX(26px); }
-            `;
-            document.head.appendChild(style);
         })();
     </script>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
     {% block extra_css %}{% endblock %}
-    <!-- Add CSRF token meta tag for AJAX requests -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
 </head>
-<body>
-    <!-- Loader overlay -->
-    <div id="loader-overlay" class="loader-overlay">
-        <div class="loader"></div>
-    </div>
+<body class="{{ body_class | default('default-page') }}">
+    <!-- Hidden CSRF Token -->
+    <form id="csrf-token-form" style="display: none;">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    </form>
 
-    <div class="theme-switch">
-        <label class="switch">
-            <!-- Add a hidden checkbox for initial state -->
-            <input type="checkbox" id="theme-toggle-initial" style="display: none;" 
-                   onload="this.checked = localStorage.getItem('theme') === 'dark'">
-            <input type="checkbox" id="theme-toggle">
-            <span class="slider round"></span>
-        </label>
-    </div>
-
+    <!-- Main content wrapper -->
     <div id="main-content">
-        <div class="page-container">
-            {% block header %}
-                <h2>{% block page_title %}{% endblock %}</h2>
-            {% endblock %}
-            
-            {% with messages = get_flashed_messages(with_categories=true) %}
-                {% if messages %}
-                    {% for category, message in messages %}
-                        <div class="alert alert-{{ category }} fade-out">{{ message }}</div>
-                    {% endfor %}
-                {% endif %}
-            {% endwith %}
-
-            <!-- Add a hidden CSRF input that can be used by all forms -->
-            <form style="display: none;">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            </form>
-
-            {% block content %}{% endblock %}
-        </div>
+        {% block content %}{% endblock %}
     </div>
 
-    <!-- Include JavaScript files -->
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
-    {% block extra_js %}{% endblock %}
 </body>
-</html> 
+</html>

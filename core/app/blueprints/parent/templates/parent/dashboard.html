@@ -6,6 +6,7 @@
 
 {% block content %}
 <div class="dashboard-container">
+    <!-- Dashboard Header -->
     <div class="dashboard-header">
         <div class="header-content">
             <h3>Welcome, {{ current_user.username }}</h3>
@@ -16,6 +17,7 @@
         </div>
     </div>
 
+    <!-- Dashboard Stats -->
     <div class="dashboard-stats">
         <div class="stat-card">
             <h4>Total Children</h4>
@@ -24,12 +26,14 @@
         <div class="stat-card">
             <h4>Parent Code</h4>
             <div class="stat-number">{{ current_user.parent_code or 'Not Generated' }}</div>
-            <form action="{{ url_for('parent.generate_new_parent_code') }}" method="POST" class="mt-2">
+            <form action="/parent/code/generate" method="POST" class="mt-2">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <button type="submit" class="btn btn-secondary btn-sm">Generate New Code</button>
             </form>
         </div>
     </div>
 
+    <!-- Children List -->
     <div class="children-list">
         <div class="section-header">
             <h3>Children Accounts</h3>
@@ -57,4 +61,4 @@
         </div>
     </div>
 </div>
-{% endblock %} 
+{% endblock %}
