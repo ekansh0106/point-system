@@ -179,3 +179,9 @@ cython_debug/
 # !migrations/env.py
 # !migrations/README
 # !migrations/script.py.mako
+
+# SSH Keys - Never commit these!
+id_rsa
+id_rsa.pub
+*.pem
+*.key
