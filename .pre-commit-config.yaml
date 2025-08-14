@@ -1,0 +1,70 @@
+repos:
+  # Pre-commit hooks for basic checks
+  - repo: https://github.com/pre-commit/pre-commit-hooks.git
+    rev: v4.4.0
+    hooks:
+      - id: trailing-whitespace          # Removes trailing whitespace
+      - id: end-of-file-fixer            # Ensures files end with a newline
+      - id: check-yaml                   # Validates YAML files
+      - id: check-added-large-files      # Prevents adding large files to the repo
+      - id: check-merge-conflict         # Ensures no merge conflict markers are present
+      - id: debug-statements             # Prevents committing `print()` and `pdb` statements
+
+  # Black for code formatting
+  - repo: https://github.com/psf/black
+    rev: 23.1.0
+    hooks:
+      - id: black
+        language_version: python3.8      # Adjust to your project's Python version
+
+  # Flake8 for linting
+  - repo: https://github.com/pycqa/flake8
+    rev: 6.1.0
+    hooks:
+      - id: flake8
+        additional_dependencies:         # Add plugins if needed
+          - flake8-bugbear               # For finding potential bugs
+          - flake8-comprehensions        # For comprehension optimizations
+        args: ["--max-line-length=88"]   # Match Black's line length
+
+  # isort for import sorting
+  - repo: https://github.com/PyCQA/isort
+    rev: 5.12.0
+    hooks:
+      - id: isort
+        args: ["--profile=black"]        # Match Black's formatting style
+
+  # Bandit for security checks
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.7.5
+    hooks:
+      - id: bandit
+        args: ["-ll"]                    # Run Bandit with low severity checks
+
+  # MyPy for type checking
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.5.1
+    hooks:
+      - id: mypy
+        args: ["--ignore-missing-imports"]
+
+  # Prettier for formatting non-Python files (e.g., HTML, CSS, JS)
+  - repo: https://github.com/pre-commit/mirrors-prettier
+    rev: v3.0.0
+    hooks:
+      - id: prettier
+        additional_dependencies:
+          - prettier@3.0.0
+
+  # Detect secrets to prevent committing sensitive information
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.4.0
+    hooks:
+      - id: detect-secrets
+        args: ["--baseline", ".secrets.baseline"]
+
+  # Shellcheck for shell script linting
+  - repo: https://github.com/koalaman/shellcheck
+    rev: v0.9.0
+    hooks:
+      - id: shellcheck

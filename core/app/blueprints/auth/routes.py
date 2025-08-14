@@ -42,53 +42,39 @@ def logout():
 
 @auth_bp.route('/register', methods=['GET', 'POST'])
 def register():
+    from .forms import RegistrationForm
+    
     if current_user.is_authenticated:
         if current_user.role == 'parent':
             return redirect(url_for('parent.dashboard'))
         else:
             return redirect(url_for('child.dashboard'))
 
-    if request.method == 'GET':
-        return render_template('auth/register.html')
+    form = RegistrationForm()
+    
+    if form.validate_on_submit():
+        # Get data from form
+        username = form.username.data
+        email = form.email.data
+        password = form.password.data
+        role = form.role.data
+        parent_code = form.parent_code.data
 
-    if request.method == 'POST':
-        username = request.form.get('username')
-        email = request.form.get('email')
-        password = request.form.get('password')
-        confirm_password = request.form.get('confirm_password')
-        parent_code = request.form.get('parent_code')
-
-        # Basic validation
-        if not all([username, email, password, confirm_password]):
-            flash('All fields are required', 'error')
-            return redirect(url_for('auth.register'))
-
-        if password != confirm_password:
-            flash('Passwords do not match', 'error')
-            return redirect(url_for('auth.register'))
-
-        # Check if username or email already exists
-        if User.query.filter_by(username=username).first():
-            flash('Username already exists', 'error')
-            return redirect(url_for('auth.register'))
-
-        if User.query.filter_by(email=email).first():
-            flash('Email already exists', 'error')
-            return redirect(url_for('auth.register'))
-
-        # Handle child registration
-        if parent_code:
+        # Handle child registration - find parent
+        parent = None
+        if role == 'child':
             parent = User.query.filter_by(parent_code=parent_code, role='parent').first()
+            # This should not happen due to form validation, but double-check
             if not parent:
                 flash('Invalid parent code', 'error')
-                return redirect(url_for('auth.register'))
+                return render_template('auth/register.html', form=form, body_class='auth-page')
 
-        # Create new user
-        user = User(username=username, email=email, role='parent' if not parent_code else 'child')
+        # Create new user with explicit role
+        user = User(username=username, email=email, role=role)
         user.set_password(password)
 
         # Link child to parent if applicable
-        if parent_code:
+        if role == 'child' and parent:
             user.parent_id = parent.id
 
         try:
@@ -99,6 +85,7 @@ def register():
         except Exception as e:
             db.session.rollback()
             flash('An error occurred during registration', 'error')
-            return redirect(url_for('auth.register'))
+            logger.error(f"Registration error: {str(e)}")
+            return render_template('auth/register.html', form=form, body_class='auth-page')
 
-    return render_template('auth/register.html',body_class='auth-page')
+    return render_template('auth/register.html', form=form, body_class='auth-page')
