@@ -39,7 +39,7 @@
             <h3>Children Accounts</h3>
             <a href="{{ url_for('parent.add_child') }}" class="btn btn-primary">Add Child Account</a>
         </div>
-        
+
         <div class="children-grid">
             {% if current_user.children %}
                 {% for child in current_user.children %}

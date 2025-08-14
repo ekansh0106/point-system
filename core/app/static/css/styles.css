@@ -149,7 +149,7 @@ switch input:checked + .slider {
     box-sizing: border-box;
     opacity: 1;
     transform: none;
-    transition: background-color 0.3s ease-in-out, 
+    transition: background-color 0.3s ease-in-out,
                 color 0.3s ease-in-out,
                 border-color 0.3s ease-in-out;
 }
@@ -291,7 +291,7 @@ h2 {
     box-shadow: 0 2px 4px var(--shadow-color);
     border-radius: 8px;
     overflow: hidden; /* Prevent child elements from overflowing */
-    transition: background-color 0.3s ease-in-out, 
+    transition: background-color 0.3s ease-in-out,
                 color 0.3s ease-in-out,
                 border-color 0.3s ease-in-out;
 }
@@ -454,7 +454,7 @@ button:hover {
         -webkit-tap-highlight-color: transparent !important;
         background-color: inherit;
     }
-    
+
     .btn:active {
         transform: scale(0.98);
     }
@@ -984,7 +984,7 @@ body.loaded .container {
         grid-template-columns: auto 1fr;
         grid-template-rows: auto auto;
     }
-    
+
     .points-date {
         grid-column: 1 / -1;
         text-align: left;
@@ -1004,7 +1004,7 @@ body.loaded .container {
 input,
 select,
 .loader-overlay {
-    transition: background-color 0.3s ease-in-out, 
+    transition: background-color 0.3s ease-in-out,
                 color 0.3s ease-in-out,
                 border-color 0.3s ease-in-out;
 }
@@ -1200,7 +1200,7 @@ body.dashboard-page .page-container {
     body.dashboard-page .page-container {
         width: 90%;
     }
-    
+
     body.dashboard-page #main-content {
         padding: 1rem;
     }
@@ -1378,10 +1378,10 @@ body.auth-page {
     margin-bottom: 1.5rem;
 }
 
-.register-container .form-control, 
-.register-container input[type="text"], 
-.register-container input[type="password"], 
-.register-container input[type="email"], 
+.register-container .form-control,
+.register-container input[type="text"],
+.register-container input[type="password"],
+.register-container input[type="email"],
 .register-container select {
     width: 100%;
     padding: 0.75rem;

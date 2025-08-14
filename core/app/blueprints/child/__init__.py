@@ -4,4 +4,4 @@ from flask import Blueprint
 from .routes import child
 
 # No need to create a new blueprint instance here
-__all__ = ['child'] 
+__all__ = ["child"]

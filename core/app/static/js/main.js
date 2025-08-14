@@ -3,20 +3,20 @@ document.addEventListener('DOMContentLoaded', function() {
     const themeToggle = document.getElementById('theme-toggle');
     const themeToggleInitial = document.getElementById('theme-toggle-initial');
     const html = document.documentElement;
-    
+
     // Get the current theme from localStorage or default to light
     const currentTheme = localStorage.getItem('theme') || 'light';
-    
+
     // Set initial states
     themeToggleInitial.checked = currentTheme === 'dark';
     themeToggle.checked = currentTheme === 'dark';
-    
+
     // Make the main toggle visible once we've set its state
     requestAnimationFrame(() => {
         themeToggle.style.opacity = '1';
         themeToggleInitial.remove(); // Remove the initial toggle
     });
-    
+
     // Update theme classes and attributes
     function applyTheme(theme) {
         html.setAttribute('data-theme', theme);
@@ -64,7 +64,7 @@ document.addEventListener('DOMContentLoaded', function() {
     Array.from(alerts).forEach(function(alert) {
         alert.style.display = 'block';
         alert.style.opacity = '1';
-        
+
         setTimeout(function() {
             alert.style.opacity = '0';
             setTimeout(function() {
@@ -123,7 +123,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Handle clicks on links
     document.addEventListener('click', (e) => {
         const link = e.target.closest('a');
-        if (link && !link.hasAttribute('download') && !link.hasAttribute('target') && 
+        if (link && !link.hasAttribute('download') && !link.hasAttribute('target') &&
             link.href && link.href.startsWith(window.location.origin)) {
             e.preventDefault();
             showLoader();
