@@ -1,7 +1,7 @@
 from flask import Flask
 from flask_cors import CORS
 from .config import config
-from .extensions import db, bcrypt, login_manager, migrate
+from .extensions import db, bcrypt, login_manager, csrf, migrate
 
 
 def create_app(config_name="default"):
@@ -20,8 +20,9 @@ def create_app(config_name="default"):
     bcrypt.init_app(app)
     migrate.init_app(app, db)
     login_manager.init_app(app)
-    # Disable CSRF for API endpoints - we'll use other auth methods
-    # csrf.init_app(app)
+    csrf.init_app(app)
+
+    # API routes use @CSRFProtect.exempt decorator individually
 
     # Import and register blueprints
     from .blueprints.auth import auth_bp
@@ -32,10 +33,7 @@ def create_app(config_name="default"):
     app.register_blueprint(parent, url_prefix="/parent")
     app.register_blueprint(child, url_prefix="/child")
 
-    # Import API routes to register them
-    from .blueprints.auth import api_routes  # noqa: F401
-    from .blueprints.parent import api_routes as parent_api  # noqa: F401
-    from .blueprints.child import api_routes as child_api  # noqa: F401
+    # API routes are now integrated into the main route files
 
     # User loader function
     from .models.user import User
